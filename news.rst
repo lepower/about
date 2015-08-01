@@ -1,6 +1,14 @@
 News
 ====
 
+2015-07-27
+----------
+- Had a new meeting @sam's around a few pizzas: Jon, Thomas, Victor, Sam.
+- Agreed better on the objectives and narrowed the first scope
+- Decided on the basis of the hardware platform: STM32, WiFi
+- Still have to find how to get the measuring part done
+
+
 2015-07-12
 ----------
 - First drafts for our goals and fingers crossed

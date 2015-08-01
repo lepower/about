@@ -1,7 +1,10 @@
 Team Members
 ============
 
-- Jon Harper
+- Mathieu Berthelot
 - Thomas Gambier
+- Jon Harper
 - Victor Perron
+- Alexis Polti
+- Samuel Tardieu
 

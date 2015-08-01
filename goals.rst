@@ -2,7 +2,7 @@ Goals
 =====
 
 .. note::
-  
+
   To ease the comprehension between current team members and because of probable
   multiple changes, this part will be written in French_.
 
@@ -12,9 +12,9 @@ Objectifs initiaux
 
 Nous voulons réaliser un **appareil de mesure** de:
 
-- courant (intensité en Ampères)
-- tension (en Volts)
-- phase (en Hertz)
+- courant ou intensité (Ampères)
+- tension (Volts)
+- fréquence (Hertz)
 
 Situé à la frontière entre la prise commandée, le watt-mètre et les objets connectés,
 cet appareil permettrait entre autres:
@@ -37,7 +37,7 @@ Vision à long terme
 ~~~~~~~~~~~~~~~~~~~
 
 La connaissance de notre consommation précise, à l'aide d'appareils **très peu coûteux**,
-dont les plans hardware sont **ouverts**, communiquant avec un protocole **open source**
+dont les plans hardware sont **ouverts**, communiquant à l'aide d'un protocole **open source**
 simple, ouvre la voie à beaucoup de possibilités.
 
 Création d'un écosystème autour de la donnée énergétique
@@ -65,10 +65,11 @@ Ces prises connectées, via un partage de données à travers une gateway vers u
 donnée (qui pourrait être une simple instance dans un village énergétiquement autosuffisant
 par exemple) peuvent détecter des variations de phase.
 
-- Augmentation légère de la phase: le réseau est en surproduction par rapport à sa consommation,
+- **Augmentation légère** de la phase: le réseau est en surproduction par rapport à sa consommation,
   la plateforme pourrait ordonner aux appareils de stockage d'énergie (batteries, chauffe-eau,
   pompes à eau) de se mettre en route;
-- Diminution légère de la phase: sous-production par rapport à la demande, il faut couper des
+
+- **Diminution légère** de la phase: sous-production par rapport à la demande, il faut couper des
   appareils non critiques (radiateurs électriques, cumulus, ...) et déclencher la mise en
   contact d'autres sources de production. Cela peut prévenir de larges pannes, notamment
   dans les PVD où le réseau ne suit pas forcément le développement économiques des ménages.
@@ -78,69 +79,92 @@ par exemple) peuvent détecter des variations de phase.
 Premier Prototype
 ~~~~~~~~~~~~~~~~~
 
-- Réaliser a minima une simulation de l'échange de données entre une future prise et une gateway BLE.
-- Identifier ce qui peut être mesuré, avec quelle précision, avec quelle fréquence.
-- Réaliser une implémentation simple sur carte nRF51/52 qui réalise là encore l'écange de données.
-- Identifier les éventuels soucis lors de l'utilisation d'un chip de mesure externe connecté au CPU BLE.
-  (occupation mémoire ? pins GPIO accessibles ? Fréquence de polling ? Interruptions possibles ?)
-- Réaliser une gateway s'appuyant sur une bibliothèque C capable de:
+- Il nous faut une board avec laquelle commencer le développement.
 
-    * Faire fonctionner la découverte et/ou l'appairage
-    * Afficher les données remontées par chaque capteur
-    * Envoyer des ordres éventuels.
+  * Choix d'un système de prise de mesure
+  * Choix d'un chip Wi-Fi à brancher sur STM32
+  * Design d'une board minimale (sur Kicad + Upverter) avec un STM32 + chip Wi-Fi + chip de mesure
 
-Dans un second temps, il faudra réaliser un prototype avec chip de mesure que l'on peut brancher
-(même de manière infâme) à au moins un appareil. De là, étudier l'utilisation de l'appareil et
-ce que l'on peut améliorer sans perdre en vision.
+- Premiers développements sur cette board
+
+  * Réaliser des mesures: attention certaines (fréquence notamment) semblent un peu touchy à réaliser !
+  * Simuler l'appairage: un SSID privé émis, un serveur interne pour recevoir la configuration, un
+    fonctionnement interne pour tenter l'appairage un certain nombre de fois...
+
+- Premiers développements côté serveur
+
+  * Recherche de plateformes & protocoles existants pour recevoir les données
+  * Plateforme très simple de collecte de données, si cela n'existe pas déjà
+  * Premières applications simples pour donner du sens aux données brutes, essayer la commande
 
 
 A résoudre
 ~~~~~~~~~~
 
-Appairage
----------
+Couche réseau
+~~~~~~~~~~~~~
 
-Doit-on:
+Il faut garder à l'esprit que le Wi-Fi n'est actuellement qu'un des protocoles de transport
+possibles; il rend plus complexe l'appairage et a une portée moyenne mais permet de ne pas
+développer de gateway.
 
-1. Mettre notre gateway en mode écoute et demander à l'utilisateur d'appuyer sur un bouton
-   d'appairage dans un temps donné ?
-2. Mettre nos appareils en mode écoute et lancer une détection *broadcast* BLE ?
-
-Le premier cas semble préférable pour améliorer l'expérience d'appairage lorsque plusieurs
-capteurs sont présents. Dépend de ce qui est prévu par la norme BLE.
+D'autres versions pourraient fonctionner sur chip radio, à la façon des `Open Energy Monitor`_
+qui utilisent des adaptateurs pour différentes
+`fréquences radio<http://openenergymonitor.org/emon/buildingblocks/which-radio-module>`_
+(868MHz, 433MHz, ...)
 
 
 Trouver des noms
 ----------------
 
-- A l'appareil (PowerPlug ? LePlug? ...)
-- Au protocole applicatif au-dessus de BLE entre le plug et la gateway.
+- A l'appareil (PowerPlug? LePlug? MindPlug?...)
+- A la ou les plateforme d'agrégation en ligne, si besoin;
+- Au protocole applicatif entre la prise (ou plus tard, la gateway) et la plateforme d'agrégation.
 
 Concernant l'appareil
 ---------------------
 
-Etant donné que l'objectif 1 est de répondre à des questions simples entre nous, type:
+L'objectif primaire est d'avoir un premier prototype à tester dans des cas simples, tels que:
 
-- Quelle est la puissance consommée par ma TV sur une semaine ?
-- Comment comparer cela avec la consommation de ma chambre ?
+- Quelle est la puissance consommée par tel ou tel appareil ?
+
+  * Machine à laver en mode économique
+  * Réfrigérateur suivant la température de la pièce
+  * TV allumée ou en veille
+
+- Comment rendre simple un appairage Wi-Fi dans le cas de ces objets ?
 
 ... une des premiers choix hardware concernera l'intervalle de puissance auquel on s'intéresse
 pour le premier prototype. Nous mesurerons probablement des puissantes de 10W (lampe) à 3000W
-(aspirateur). Quelle méthode de mesure/chip adopter pour rester précis sur cet intervalle étendu ?
+(aspirateur).
+
+Quelle sera la précision attendue ou nécessaire ? Quelle est celle des produits du marché ?
+
+
+Chip de mesure
+--------------
+
+- OpenEnergyMonitor utilise des clamps (SCT-013-000) pour la mesure de courant et une résistance
+  de shunt pour le potentiel. La fréquence est mesurée en prenant 53 mesures par cycle, soit environ
+  2000 mesures par seconde. Problème, cela nécessite une alimentation externe et est hors de prix.
+  Par contre pas besoin de séparation des circuits, de redresseur, etc.
+
+- Des tas d'autres prises connectées existent `dans le commerce<https://www.aruco.com/tag/prise-connectee/>`_.
+  Il serait intéressant de passer commande et d'analyser les circuits d'alimentation.
+
+- Alexis a des pistes de chip de mesure que nous pourrions réutiliser, cf `lepower/hardware`_.
+
+- Il est proposé de poser la question à des connaissances (A.M) pour en savoir plus à ce sujet.
 
 Acteurs et écosystème
 ---------------------
 
-Mieux connaître les acteurs, protocoles, nonprofit... aujourd'hui existants. Points forts,
-points faibles ? Où se place-t-on ? Notre produit a-t-il toujours un intérêt ? Quelle est sa
-différence ? Si des projets équivalent existent, les rejoindre ? Identifier la différence ?
-
-On veut savoir si:
-
-- le produit a une chance de servir étant donnés les centaines de protocoles & hardware déjà
-  existants dans le secteur (cf. Legrand Smart Building)
-- nous ne devenions pas une énième startup qui "révolutionne le smart grid" mais quelque chose
-  de vraiment utile.
+Mieux connaître les centaines d'acteurs, protocoles, nonprofit... aujourd'hui existants.
+Quels sont leurs points forts, points faibles ? Où se place-t-on dans ce milieu ?
+Notre produit a-t-il toujours un intérêt ? Quelle est sa différence ?
+Si des projets équivalent existent, les rejoindre ? Identifier la différence ?
 
 
 .. _French: https://en.wikipedia.org/wiki/French_language
+.. _Open Energy Monitor: http://openenergymonitor.org/emon/
+.. _lepower/hardware: https://github.com/lepower/hardware
