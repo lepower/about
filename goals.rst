@@ -110,7 +110,7 @@ développer de gateway.
 
 D'autres versions pourraient fonctionner sur chip radio, à la façon des `Open Energy Monitor`_
 qui utilisent des adaptateurs pour différentes
-`fréquences radio<http://openenergymonitor.org/emon/buildingblocks/which-radio-module>`_
+`fréquences radio <http://openenergymonitor.org/emon/buildingblocks/which-radio-module>`_
 (868MHz, 433MHz, ...)
 
 
@@ -149,7 +149,7 @@ Chip de mesure
   2000 mesures par seconde. Problème, cela nécessite une alimentation externe et est hors de prix.
   Par contre pas besoin de séparation des circuits, de redresseur, etc.
 
-- Des tas d'autres prises connectées existent `dans le commerce<https://www.aruco.com/tag/prise-connectee/>`_.
+- Des tas d'autres prises connectées existent `dans le commerce <https://www.aruco.com/tag/prise-connectee/>`_.
   Il serait intéressant de passer commande et d'analyser les circuits d'alimentation.
 
 - Alexis a des pistes de chip de mesure que nous pourrions réutiliser, cf `lepower/hardware`_.

@@ -9,7 +9,7 @@ The documentation is currently written in [RST][rst] and compiled using [Sphinx]
 In a [virtualenv][virtualenv], execute:
 
     pip install sphinx
-    make docs
+    make html
 
 The index page of the documentation will be located at `build/sphinx/html/index.html`
 
